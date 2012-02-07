@@ -1,0 +1,575 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>SIMON classic game</title>
+	<script src="./js/jquery-1.6.2.min.js"></script>
+	<script src="./development-bundle/ui/jquery.ui.core.js"></script>
+	<script src="./development-bundle/ui/jquery.ui.position.js"></script>
+	<script src="./development-bundle/ui/jquery.ui.widget.js"></script>
+	<script src="./development-bundle/ui/jquery.ui.button.js"></script>
+  <link rel="stylesheet" href="./css/blueprint/screen.css" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="./css/blueprint/print.css" type="text/css" media="print"> 
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="./css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <![endif]-->
+  <link rel="stylesheet" href="./css/simon_blueprint.css">
+
+<!-- SIMON PLUGIN - BEGIN --> 
+	<script>
+	$(function() {
+		// the widget definition, where "jgames" is the namespace,
+		// "simon" the widget name
+		$.widget( "jgames.simon", {
+			// default options
+			options: {
+				red: 255,
+				green: 0,
+				blue: 0,
+				
+				i: 0,
+				_CURR: 0,
+				buttonId: 0,
+				
+				seq: [],
+				colorDecode: ["green","red","yellow","blue"],
+
+				// callbacks
+				change: null,
+				random: null
+			},
+
+			// the constructor
+			_create: function() {
+				this.element
+					// add a class for theming
+					.addClass( "simon-game" )
+					// prevent double click to select text
+					.disableSelection();
+								
+				this.options.buttonId = this.options.buttonId + 1;
+
+				// bind click events on the pusher button to the random method
+				// in 1.9 would use this._bind( this.pusher, { click: "random" });
+				var that = this;
+
+				this._refresh();
+			},
+
+			// called when created, and later when changing options
+			_refresh: function() {
+				this.element.css( "background-color", "rgb(" +
+					this.options.red +"," +
+					this.options.green + "," +
+					this.options.blue + ")"
+				);
+
+				// trigger a callback/event
+				this._trigger( "change" );
+			},
+
+			// a public method to change the color to a random value
+			// can be called directly via .simon( "random" )
+			random: function( event ) {
+				var colors = {
+					red: Math.floor( Math.random() * 256 ),
+					green: Math.floor( Math.random() * 256 ),
+					blue: Math.floor( Math.random() * 256 )
+				};
+
+			},
+
+			//public method save_next_random
+			save_next_random: function() {
+				console.log("save_next_random() called ...");
+				console.log("this.options.i="+this.options.i);
+				this.options.seq[this.options.i] = Math.floor( Math.random() * 4 );
+			    console.log("this.options.seq[options.i]="+this.options.seq[this.options.i]);
+			},
+			
+			//public method show_complete_sequence
+			show_complete_sequence: function() {
+				var len = this.options.seq.length;
+				console.log("show_complete_sequence() run - len="+len);
+				for(var i = 0; i < len; i++) {
+					console.log("show button:" +this.options.colorDecode[this.options.seq[i]]);
+				}
+			},
+
+			// events bound via _bind are removed automatically
+			// revert other modifications here
+			_destroy: function() {
+				// remove generated elements
+				this.pusher.remove();
+
+				this.element
+					.removeClass( "simon-game" )
+					.enableSelection()
+					.css( "background-color", "transparent" );
+			},
+
+			// _setOptions is called with a hash of all options that are changing
+			// always refresh when changing options
+			_setOptions: function() {
+				// in 1.9 would use _superApply
+				$.Widget.prototype._setOptions.apply( this, arguments );
+				this._refresh();
+			},
+
+			// _setOption is called for each individual option that is changing
+			_setOption: function( key, value ) {
+				// prevent invalid color values
+				if ( /red|green|blue/.test(key) && (value < 0 || value > 255) ) {
+					return;
+				}
+				// in 1.9 would use _super
+				$.Widget.prototype._setOption.call( this, key, value );
+			}
+		});
+
+		// initialize with soft green 
+		$( "#green-button" ).simon({
+			red: 0,
+			green: 175,
+			blue: 0
+		});
+
+		// initialize with soft red 
+		$( "#red-button" ).simon({
+			red: 175,
+			green: 0,
+			blue: 0
+		});
+		
+		// initialize with soft yellow 
+		$( "#yellow-button" ).simon({
+			red: 175,
+			green: 175,
+			blue: 0
+		});
+		
+		// initialize with soft blue 
+		$( "#blue-button" ).simon({
+			red: 0,
+			green: 0,
+			blue: 175
+		});
+
+		// click to toggle enabled/disabled
+		$( "#disable" ).toggle(function() {
+			// use the custom selector created for each widget to find all instances
+			$( ":simon-game" ).simon( "disable" );
+		}, function() {
+			$( ":simon-game" ).simon( "enable" );
+		});
+
+	});
+	
+	$(function(){
+        //
+        // Register events
+        //
+
+		var _DEBUG = true;
+        var _REC = 0;
+		var _CURR = 0;
+		var _ALL_STILL_CORRECT = true;
+		var buttonId = 0;
+		var _SEQUENCE = [];
+		var colorDecode = ["green","red","yellow","blue"];
+		var _IS_GAME_RUNNING = false;
+		var _LAST_RECORD = 0;
+		
+		//Delay values
+		var _FIRST_PLAY_SQUENCE_DELAY = 2500;
+		var _BETWEEN_BUTTON_DELAY = 850;
+		var _SHOW_THE_BUTTON_BEGIN_DELAY = 400;
+		var _SHOW_THE_BUTTON_END_DELAY = 400;
+		
+		function _show_status_msg( msg ){
+			$(".simon-game #game-status")
+			.removeClass("info")
+			.removeClass("error")
+			.removeClass("success")
+			.addClass("notice").html(msg);
+		}
+		
+		function _show_info_msg( msg ){
+			$(".simon-game #game-status")
+			.removeClass("notice")
+			.removeClass("error")
+			.removeClass("success")
+			.addClass("info").html(msg);
+		}
+		function _show_error_msg( msg ){
+			$(".simon-game #game-status")
+			.removeClass("notice")
+			.removeClass("info")
+			.removeClass("success")
+			.addClass("error").html(msg);
+		}
+		function _show_success_msg( msg ){
+			$(".simon-game #game-status")
+			.removeClass("error")
+			.removeClass("info")
+			.removeClass("notice")
+			.addClass("success").html(msg);
+		}
+		
+		var reset = function reset(){
+			if (_LAST_RECORD < _REC){ 
+				_LAST_RECORD = _REC;
+			}
+			//$(".simon-game #game-status").html("LAST RECORD "+_LAST_RECORD+" HITS!");
+			_show_info_msg("LAST RECORD "+_LAST_RECORD+" HITS!");
+			_REC = 0;
+			_CURR = 0;
+			buttonId = 0;
+			_SEQUENCE = [];
+			_ALL_STILL_CORRECT = true;
+			_IS_GAME_RUNNING = false;
+		}
+		
+		var save_next_random = function save_next_random(next_rec) {
+			if (_DEBUG) { 
+				console.log("save_next_random() called ...");
+				console.log("next_rec="+next_rec);
+			}
+			_SEQUENCE[next_rec] = Math.floor( Math.random() * 4 );
+			if (_DEBUG) { 
+				console.log("_SEQUENCE[next_rec]="+_SEQUENCE[next_rec]);
+			}
+		}
+		
+		//var show_complete_seq = function show_complete_seq() {
+		function show_complete_seq(sequence) {
+			var len = sequence.length;
+			var colorDecode = ["green","red","yellow","blue"];
+			var strColor;
+			var strColorArr = [];
+			
+			if (_DEBUG) { 
+				console.log("show_complete_sequence(sequence) running... "
+						+"[sequence]"+sequence
+						+"[len]"+len);
+			}
+			
+			//Añado un primer delay a la cola (per evitar de iniciar demasiado pronto)
+			$(".simon-game #play").delay( _FIRST_PLAY_SQUENCE_DELAY , "showQ" );
+			
+			$(".simon-game #play").queue(
+				"showQ",
+				function(next)
+	            {	
+					_show_status_msg("LOOK THE SEQUENCE...");
+					
+					if (_DEBUG){
+						console.log("[show_complete_seq]inner queue ..."
+								+"primer delay a la cola (per evitar de iniciar demasiado pronto)");
+					}
+					next();
+	            }
+			);
+
+			for(var count = 0; count < len; count++) {
+				strColor=colorDecode[sequence[count]];
+				strColorArr.push(strColor);
+				if (_DEBUG){
+					console.log("[show_complete_seq]inner loop _RECcount]"+count
+							+"[strColor]"+strColor);
+				}
+				
+				$(".simon-game #play").queue(
+					"showQ",
+					function(next)
+		            {	
+		            	var clr = strColorArr.pop();
+						if (_DEBUG){
+							console.log("[show_complete_seq]inner queue ..."
+									+"[this]"+this
+									+"[count]"+count
+									+"[clr]"+clr);
+						}
+						//setTimeout(strFunc,		800);
+		            	show_the_button(clr);
+		            	next();
+		            }
+				);
+				
+				$(".simon-game #play").delay( _BETWEEN_BUTTON_DELAY, "showQ" );
+				//$(".simon-game #play").dequeue( "showQ" );//(?)
+			}
+			//start the showQ
+			console.log("[show_complete_seq] starting the 'showQ' queue ...");
+			strColorArr.reverse();
+
+			$(".simon-game #play").queue(
+				"showQ",
+				function(next)
+	            {	
+					_show_status_msg("YOUR TURN...");
+	            	next();
+	            }
+			);
+			
+			$(".simon-game #play").dequeue( "showQ" );//(?)
+		}
+		
+		var checkCorrectColor = function checkCorrectColor( colorPressed ){
+			if (_DEBUG) { 
+				console.log("[checkCorrectColor] init..."
+						+"[colorPressed]"+colorPressed
+						+"[_SEQUENCE]"+_SEQUENCE
+						+"[_CURR]"+_CURR
+						+"[_IS_GAME_RUNNING?]"+_IS_GAME_RUNNING);
+			}
+			if (!_IS_GAME_RUNNING) { return false};
+			
+			if (colorPressed == colorDecode[_SEQUENCE[_CURR]]){
+				console.log("[checkCorrectColor] '"+colorPressed+"' is correct!");
+				_ALL_STILL_CORRECT = true;
+			} else {
+				console.log("[checkCorrectColor] '"+colorPressed+"' is NOT correct!");
+				_ALL_STILL_CORRECT =  false;
+			}
+			
+			if (_ALL_STILL_CORRECT){
+				if (_CURR == _REC) {
+					console.log("[checkCorrectColor] _CURR == _REC; save_next_random + show_complete_seq...");
+					save_next_random(_REC+=1);
+					_show_success_msg("Good memory! go to the next level: "+(_REC+1)+" Hits!");
+					_CURR = 0;
+					show_complete_seq(_SEQUENCE);
+				} else {
+					console.log("[checkCorrectColor] _CURR=_CURR+1; continue waiting correct sequence...");
+					_CURR=_CURR+1;
+				}
+			} else {
+				$(".sound-error")[0].play();
+				alert("WRONG HIT!: Your record was: "+_REC+" hits");
+				reset();// ?
+			}
+			
+		}
+		
+        $('.simon-game #play').bind('click',function(){
+        	if (_DEBUG) { 
+        		console.log('play button Clicked!');
+        	}
+           reset();
+           _IS_GAME_RUNNING = true;
+           save_next_random(_REC);
+           _show_status_msg("OK, Let's Play...");
+           show_complete_seq(_SEQUENCE);
+          });
+        
+        $('.simon-game #reset').bind('click',function(){
+        	if (_DEBUG) { 
+        		console.log('rest button Clicked!');
+        	}
+           reset();
+          });
+        
+        var strongGreenHxCode = '#00ff00';// red: 0, green: 255, blue: 0
+        var softGreenHxCode =  '#00af00';// red: 0, green: 175, blue: 0
+        
+		var strongRedHxCode = '#ff0000'; // red: 255, green: 0, blue: 0
+		var softRedHxCode = '#af0000'; // red: 175, green: 0, blue: 0
+		
+		var strongYellowHxCode = '#ffff00'; // red: 255, green: 255, blue: 0
+		var softYellowHxCode = '#afaf00'; // red: 175, green: 175, blue: 0
+		
+		var strongBlueHxCode = '#0000ff'; // red: 0, green: 0, blue: 255
+		var softBlueHxCode = '#0000af'; // red: 0, green: 0, blue: 175
+        	
+        //var show_the_button = function show_the_button(obj, strColor){
+		var show_the_button = function show_the_button(strColor){
+			var obj = ".simon-game #"+strColor+"-button";
+            var tableColors = {
+            		"green": [strongGreenHxCode, softGreenHxCode],
+            		"red": [strongRedHxCode, softRedHxCode],
+            		"yellow": [strongYellowHxCode, softYellowHxCode],
+            		"blue": [strongBlueHxCode, softBlueHxCode]
+            };
+			
+			if (_DEBUG){
+            	console.log('show_the_button running... [obj]'+obj+', [strColor]'+strColor);
+            	console.log('show_the_button running... [tableColors[strColor]]'+tableColors[strColor]);
+        	}
+        	
+			$("#"+strColor+"-button")
+            .queue("showQB", function (next){
+            	// set with strong green
+    			$("#"+strColor+"-button").css('background-color', tableColors[strColor][0]);
+    			next();
+			});
+			
+			$("#"+strColor+"-button").delay(_SHOW_THE_BUTTON_BEGIN_DELAY, "showQB");
+			
+			$(".sound-"+strColor)[0].play();//prueba
+			
+			
+    		$("#"+strColor+"-button")
+            .queue("showQB", function (next){
+    			//$(".sound-"+strColor)[0].play();
+    			// set with soft color
+                $("#"+strColor+"-button").css('background-color', tableColors[strColor][1]);
+    			next();
+			});
+    		$("#"+strColor+"-button").delay(_SHOW_THE_BUTTON_END_DELAY, "showQB");//prueba
+    		
+    		$("#"+strColor+"-button").dequeue( "showQB" );
+	
+        }
+        
+        $('.simon-game #green-button').bind('click',function(){
+        	if (_DEBUG) { 
+        		console.log('green button Clicked!');
+        	}
+        	
+        	show_the_button("green");
+        	
+        	checkCorrectColor("green");
+        
+        });
+        
+        $('.simon-game #red-button').bind('click',function(){
+            console.log('red button Clicked!');
+
+            show_the_button("red");
+            
+            checkCorrectColor("red");
+            
+        });
+        
+        $('.simon-game #yellow-button').bind('click',function(){
+        	if (_DEBUG) { 
+        		console.log('yellow button Clicked!');
+        	}
+        	
+        	show_the_button("yellow");
+        	
+        	checkCorrectColor("yellow");
+
+           });
+        
+        $('.simon-game #blue-button').bind('click',function(){
+        	if (_DEBUG) { 
+        		console.log('blue button Clicked!');
+        	}
+        	
+        	show_the_button("blue");
+        	
+        	checkCorrectColor("blue");            
+            
+           });
+
+	 });
+	
+	</script>
+<!-- SIMON PLUGIN - END -->
+</head>
+<body>					
+<!--  div class="container">
+	<h1>A simple sample page</h1>
+	<hr>
+	<h2 class="alt">This sample page demonstrates a tiny fraction of what you get with Blueprint.</h2>
+	<hr>	
+	<div class="span-13 colborder">
+		<h6>Push the button</h6>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+		<hr>
+		<hr class="space">
+		<div class="span-7">
+			<h6>green-button</h6>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</p>
+		</div>
+		<div class="span-6 last">
+			<h6>inner second</h6>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</p>
+		</div>
+	</div>
+	<div class="span-8 colborder last">
+		<h6>The second (last) column</h6>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+		Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+	</div>
+	<hr>
+	<hr class="space">
+	<div class="span-3">
+		The first column
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...</p>
+	</div>
+	<div class="span-9 colborder">
+		The second column
+		<p>Lorem ipsum dolor sit amet, consectetur....</p>
+	</div>
+	<div class="span-9 colborder last">
+		The third (last) column
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tmpor incididunt ...</p>
+	</div>
+	<div class="span-11 colborder">
+		The first column
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+	</div>
+	<div class="span-11 last">
+		The second (last) column
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+	</div>
+	<hr>
+		<h2 class="alt">You may pick and choose amongst these and many more features, so be bold.</h2>
+	<hr>
+</div -->
+<audio class="sound-green" preload>
+        <source src="./audio/DO1.WAV"></source>
+        <!-- source src="./audio/do.0.5.wav"></source -->
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-red" preload>
+        <source src="./audio/RE.WAV"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-yellow" preload>
+        <source src="./audio/MI.WAV"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-blue" preload>
+        <source src="./audio/FA.WAV"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-error" preload>
+        <source src="./audio/beep-8.wav"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+
+<div class="container simon-game">
+	<h1>Simon game</h1>
+	<hr>
+	<div class="_notice">
+	<h2 class="alt game-description notice" id="game-status">Do you want to play?</h1>
+	</div>
+	<hr>	
+	<div class="span-3 quartercircle_ul" id="green-button"><br/><br/><br/><br/><br/></div>
+	<div class="span-2"><br/></div>
+	<div class="span-3 quartercircle_ur" id="red-button"><br/><br/><br/><br/><br/></div>
+	<div class="span-16 last"><br/><br/><br/><br/><br/></div>
+	<div class="span-3"><br/></div>
+	<div class="span-2">
+		<!--  div class="box" -->
+		<div class="info">
+			<a href="#" id="play"><strong>Start</strong></a><br/>
+			<a href="#" id="reset"><strong>Stop</strong></a>
+		</div>
+	</div>
+	<div class="span-19 last"><br/><br/><br/><br/></div>
+	<div class="span-3 quartercircle_dl" id="yellow-button"><br/><br/><br/><br/><br/></div>
+	<div class="span-2"><br/></div>
+	<div class="span-3 quartercircle_dr" id="blue-button"><br/><br/><br/><br/><br/></div>
+	<div class="span-16 last"><br/><br/><br/><br/><br/></div>
+	<hr class="space">
+	<hr>	
+		<h4 class="alt center"><strong>Simon Game Credits: </strong>jomayma would thanx to jQuery API and blueprint CSS libraries.</h4>
+	<hr>
+</div>
+</body>
+</html>
