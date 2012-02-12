@@ -11,42 +11,27 @@
 (function ($) {
 
 	var simon = {
+			DEBUG_ENABLED : true,
 			debug: function (msg) {
-				console.log(this,msg);
-			},
-			onGame: function () {},
-			onWait: function () {},
-			onSave: function () {}
-	};
-
-	window.simon = simon;
-
-	$.fn.simon = function(options) {
-		/*
-	    if (typeof options === "object") {
-		   for (var ndx in simon) {
-			   if (options[ndx] !== undefined) {
-				   simon[ndx] = options[ndx];
-			   }
-		   }
-	   }
-		 */
-
-		// Create some defaults, extending them with any options that were provided
-		simon = $.extend( {
-			DEBUG_ENABLED : true
-			, debug: function (msg) {
 				if (this.DEBUG_ENABLED) {
 					console.log(this, msg);
 				}
+			},
+			playColorSound: function (colorStr) {
+				this.debug("You must implement playColorSound function!");
+			},
+			playErrorSound: function () {
+				this.debug("You must implement playErrorSound function!");
 			}
-		}, options);
+	};
 
-		simon.debug("$.fn.simon was called!");
-		//
-		// Register events
-		//
+	window.simon = simon;
+	
+	$.fn.simon = function(options) {
+		// Create some defaults, extending them with any options that were provided
+		simon = $.extend( simon, options);
 
+		//Inner costants
 		var _DEBUG = simon.DEBUG_ENABLED;
 		var _REC = 0;
 		var _CURR = 0;
@@ -97,7 +82,6 @@
 			if (_LAST_RECORD < _REC){ 
 				_LAST_RECORD = _REC;
 			}
-			//$(".simon-game #game-status").html("LAST RECORD "+_LAST_RECORD+" HITS!");
 			_show_info_msg("LAST RECORD "+_LAST_RECORD+" HITS!");
 			_REC = 0;
 			_CURR = 0;
@@ -114,7 +98,6 @@
 			simon.debug("_SEQUENCE[next_rec]="+_SEQUENCE[next_rec]);
 		}
 
-		//var show_complete_seq = function show_complete_seq() {
 		function show_complete_seq(sequence) {
 			var len = sequence.length;
 			var colorDecode = ["green","red","yellow","blue"];
@@ -153,19 +136,15 @@
 									+"[this]"+this
 									+"[count]"+count
 									+"[clr]"+clr);
-							//setTimeout(strFunc,		800);
 							show_the_button(clr);
 							next();
 						}
 				);
-
 				$(".simon-game #play").delay( _BETWEEN_BUTTON_DELAY, "showQ" );
-				//$(".simon-game #play").dequeue( "showQ" );//(?)
 			}
 			//start the showQ
 			simon.debug("[show_complete_seq] starting the 'showQ' queue ...");
 			strColorArr.reverse();
-
 			$(".simon-game #play").queue(
 					"showQ",
 					function(next)
@@ -174,18 +153,17 @@
 						next();
 					}
 			);
-
 			$(".simon-game #play").dequeue( "showQ" );//(?)
 		}
 
-		var checkCorrectColor = function checkCorrectColor( colorPressed ){
+		function checkCorrectColor( colorPressed ){
 			simon.debug("[checkCorrectColor] init..."
 					+"[colorPressed]"+colorPressed
 					+"[_SEQUENCE]"+_SEQUENCE
 					+"[_CURR]"+_CURR
 					+"[_IS_GAME_RUNNING?]"+_IS_GAME_RUNNING);
 
-			if (!_IS_GAME_RUNNING) { return false};
+			if (!_IS_GAME_RUNNING) { return false };
 
 			if (colorPressed == colorDecode[_SEQUENCE[_CURR]]){
 				simon.debug("[checkCorrectColor] '"+colorPressed+"' is correct!");
@@ -209,7 +187,7 @@
 					_CURR=_CURR+1;
 				}
 			} else {
-				$(".sound-error")[0].play();
+				simon.playErrorSound();
 				alert("WRONG HIT!: Your record was: "+_REC+" hits");
 				reset();// ?
 			}
@@ -242,8 +220,7 @@
 		var strongBlueHxCode = '#0000ff'; // red: 0, green: 0, blue: 255
 		var softBlueHxCode = '#0000af'; // red: 0, green: 0, blue: 175
 
-		//var show_the_button = function show_the_button(obj, strColor){
-		var show_the_button = function show_the_button(strColor){
+		function show_the_button(strColor){
 			var obj = ".simon-game #"+strColor+"-button";
 			var tableColors = {
 					"green": [strongGreenHxCode, softGreenHxCode],
@@ -264,11 +241,10 @@
 
 			$("#"+strColor+"-button").delay(_SHOW_THE_BUTTON_BEGIN_DELAY, "showQB");
 
-			$(".sound-"+strColor)[0].play();//prueba
+			simon.playColorSound(strColor);
 
 			$("#"+strColor+"-button")
 			.queue("showQB", function (next){
-				//$(".sound-"+strColor)[0].play();
 				// set with soft color
 				$("#"+strColor+"-button").css('background-color', tableColors[strColor][1]);
 				next();
@@ -279,26 +255,26 @@
 
 		}
 
+		//
+		// Register events
+		//
 		$('.simon-game #green-button').bind('click',function(){
 			simon.debug('green button Clicked!');
 			show_the_button("green");
 			checkCorrectColor("green");
 
 		});
-
 		$('.simon-game #red-button').bind('click',function(){
 			simon.debug('red button Clicked!');
 			show_the_button("red");
 			checkCorrectColor("red");
 
 		});
-
 		$('.simon-game #yellow-button').bind('click',function(){
 			simon.debug('yellow button Clicked!');       	
 			show_the_button("yellow");       	
 			checkCorrectColor("yellow");
 		});
-
 		$('.simon-game #blue-button').bind('click',function(){
 			simon.debug('blue button Clicked!');
 			show_the_button("blue");

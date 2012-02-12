@@ -9,9 +9,9 @@
 	  <link rel="stylesheet" href="./css/blueprint/ie.css" type="text/css" media="screen, projection">
 	<![endif]-->
 	<link rel="stylesheet" href="./css/simon_blueprint.css">
-	<!--  script src="./js/jquery/jquery-1.6.2.min.js"></script -->
-	<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"/></script>
-	<script src="./js/jquery.simon.js"></script>	
+	<script src="./js/jquery/jquery-1.6.2.min.js"></script>
+	<!--  script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"/></script -->
+	<script src="./js/jquery.simon.js"></script>
 	<!-- script type="text/javascript" src="http://github.com/jomayma/libros-de/tree/master/games/simon_game/webapp-simon-game/src/main/webapp/js/jquery.simon.js"/ -->
 </head>
 <body>					
@@ -71,7 +71,15 @@
 <script type="text/javascript">
 <!-- SIMON PLUGIN - BEGIN --> 
 jQuery("#simon").simon({
-	   DEBUG_ENABLED: true
+	   DEBUG_ENABLED: true,
+	   playColorSound: function (colorStr) {
+			this.debug("playColorSound(using html5 audio tag) -> colorStr param :: "+colorStr);
+			$(".sound-"+colorStr)[0].play();
+	   },
+	   playErrorSound: function() {
+		    this.debug("playErrorSound(using html5 audio tag)");
+			$(".sound-error")[0].play();
+	   }
 });
 </script>
 <!-- SIMON PLUGIN - END -->
