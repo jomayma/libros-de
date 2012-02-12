@@ -12,7 +12,7 @@
 	<script src="./js/jquery/jquery-1.6.2.min.js"></script>
 	<script src="./js/jquery.simon.js"></script>
 	<!-- include SM2 library -->
-	<script type="text/javascript" src="./js/s2/soundmanager2.js"></script>	
+	<script src="./js/s2/soundmanager2-nodebug-jsmin.js"></script>
 </head>
 <body>					
 <div class="container simon-game" id="simon">
@@ -42,7 +42,7 @@
 	<hr>	
 		<h4 class="alt center">
 		<strong>Simon Game Credits: </strong>
-		jomayma would thanx to jQuery API and blueprint CSS libraries.
+		jomayma would thanx to jQuery API, blueprint CSS and Sound Manager 2 libraries.
 		</h4>
 	<hr>
 </div>
@@ -80,7 +80,7 @@ soundManager.onready(function(){
 });
 
 jQuery("#simon").simon({
-	   DEBUG_ENABLED: true,
+	   DEBUG_ENABLED: false,
 	   playColorSound: function (colorStr) {
 			this.debug("playColorSound(with soundManager 2) -> colorStr param :: "+colorStr);
 			soundManager.play(colorStr);

@@ -78,11 +78,11 @@
 			.addClass("success").html(msg);
 		}
 
-		var reset = function reset(){
+		function reset(){
 			if (_LAST_RECORD < _REC){ 
 				_LAST_RECORD = _REC;
 			}
-			_show_info_msg("LAST RECORD "+_LAST_RECORD+" HITS!");
+			_show_info_msg("HIGHSCORE "+_LAST_RECORD+" HITS!");
 			_REC = 0;
 			_CURR = 0;
 			buttonId = 0;
@@ -91,7 +91,7 @@
 			_IS_GAME_RUNNING = false;
 		}
 
-		var save_next_random = function save_next_random(next_rec) {
+		function save_next_random(next_rec) {
 			simon.debug("save_next_random() called ...");
 			simon.debug("next_rec="+next_rec);
 			_SEQUENCE[next_rec] = Math.floor( Math.random() * 4 );
