@@ -51,7 +51,6 @@ a.button_round_down:active {
 .quartercircle_ul:active {
    	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
    	top: 4px;
-   	background-color: #00ff00;
 }
 .ul_playing {
 	background-color: #00ff00;	
@@ -77,8 +76,11 @@ a.button_round_down:active {
 .quartercircle_ur:active {
    	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
    	top: 4px;
-   	background-color: #ff0000;
 }
+.ur_playing {
+	background-color: #ff0000;
+}
+
 .quartercircle_dl {
      margin: 0 auto;
      border-width: 3px;
@@ -91,8 +93,11 @@ a.button_round_down:active {
 .quartercircle_dl:active {
    	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
    	top: 4px;
-   	background-color: #ffff00;
 }
+.dl_playing{
+	background-color: #ffff00;
+}
+
 .quartercircle_dr {
      right: 0px;
 	 margin-bottom: 0px;
@@ -109,5 +114,15 @@ a.button_round_down:active {
 .quartercircle_dr:active {
    	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
    	top: 4px;
-   	background-color: #0000ff;
+}
+.dr_playing {
+	background-color: #0000ff;
+}
+
+.show {
+	visibility:visible;
+}
+
+.hide {
+	visibility:hidden;
 }

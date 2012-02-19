@@ -17,8 +17,8 @@
 					console.log(this, msg);
 				}
 			},
-			playColorSound: function (colorStr) {
-				this.debug("You must implement playColorSound function!");
+			playButtonSound: function (buttonStr) {
+				this.debug("You must implement playButtonSound function!");
 			},
 			playErrorSound: function () {
 				this.debug("You must implement playErrorSound function!");
@@ -38,7 +38,7 @@
 		var _ALL_STILL_CORRECT = true;
 		var buttonId = 0;
 		var _SEQUENCE = [];
-		var colorDecode = ["green","red","yellow","blue"];
+		var _buttonDecode = ["ul","ur","dl","dr"];
 		var _IS_GAME_RUNNING = false;
 		var _LAST_RECORD = 0;
 
@@ -100,9 +100,9 @@
 
 		function show_complete_seq(sequence) {
 			var len = sequence.length;
-			var colorDecode = ["green","red","yellow","blue"];
-			var strColor;
-			var strColorArr = [];
+			//colorDecode = ["green","red","yellow","blue"];
+			var strButton;
+			var strButtonArr = [];
 
 			simon.debug("show_complete_sequence(sequence) running... "
 					+"[sequence]"+sequence
@@ -123,15 +123,15 @@
 			);
 
 			for(var count = 0; count < len; count++) {
-				strColor=colorDecode[sequence[count]];
-				strColorArr.push(strColor);
+				strButton=_buttonDecode[sequence[count]];
+				strButtonArr.push(strButton);
 				simon.debug("[show_complete_seq]inner loop _RECcount]"+count
-						+"[strColor]"+strColor);
+						+"[strButton]"+strButton);
 				$(".simon-game #play").queue(
 						"showQ",
 						function(next)
 						{	
-							var clr = strColorArr.pop();
+							var clr = strButtonArr.pop();
 							simon.debug("[show_complete_seq]inner queue ..."
 									+"[this]"+this
 									+"[count]"+count
@@ -144,7 +144,7 @@
 			}
 			//start the showQ
 			simon.debug("[show_complete_seq] starting the 'showQ' queue ...");
-			strColorArr.reverse();
+			strButtonArr.reverse();
 			$(".simon-game #play").queue(
 					"showQ",
 					function(next)
@@ -156,33 +156,35 @@
 			$(".simon-game #play").dequeue( "showQ" );//(?)
 		}
 
-		function checkCorrectColor( colorPressed ){
-			simon.debug("[checkCorrectColor] init..."
-					+"[colorPressed]"+colorPressed
+		function checkCorrectButton( buttonPressed ){
+			simon.debug("[checkCorrectButton] init..."
+					+"[buttonPressed]"+buttonPressed
 					+"[_SEQUENCE]"+_SEQUENCE
 					+"[_CURR]"+_CURR
 					+"[_IS_GAME_RUNNING?]"+_IS_GAME_RUNNING);
 
-			if (!_IS_GAME_RUNNING) { return false };
+			if (!_IS_GAME_RUNNING) { 
+				return false; 
+			}
 
-			if (colorPressed == colorDecode[_SEQUENCE[_CURR]]){
-				simon.debug("[checkCorrectColor] '"+colorPressed+"' is correct!");
+			if (buttonPressed == _buttonDecode[_SEQUENCE[_CURR]]){
+				simon.debug("[checkCorrectButton] '"+buttonPressed+"' is correct!");
 				_ALL_STILL_CORRECT = true;
 			} else {
-				simon.debug("[checkCorrectColor] '"+colorPressed+"' is NOT correct!");
+				simon.debug("[checkCorrectButton] '"+buttonPressed+"' is NOT correct!");
 				_ALL_STILL_CORRECT =  false;
 			}
 
 			if (_ALL_STILL_CORRECT){
 				if (_CURR == _REC) {
-					simon.debug("[checkCorrectColor] _CURR == _REC; save_next_random + show_complete_seq...");
+					simon.debug("[checkCorrectButton] _CURR == _REC; save_next_random + show_complete_seq...");
 					save_next_random(_REC+=1);
 					_show_success_msg("Good memory! go to the next level: "+(_REC+1)+" Hits!");
 					_CURR = 0;
 					show_complete_seq(_SEQUENCE);
 				} else {
 					if (_DEBUG) {
-						console.log("[checkCorrectColor] _CURR=_CURR+1; continue waiting correct sequence...");
+						console.log("[checkCorrectButton] _CURR=_CURR+1; continue waiting correct sequence...");
 					}
 					_CURR=_CURR+1;
 				}
@@ -204,7 +206,7 @@
 		});
 
 		$('.simon-game #reset').bind('click',function(){
-			simon.debug('rest button Clicked!');
+			simon.debug('reset button Clicked!');
 			reset();
 		});
 
@@ -220,65 +222,65 @@
 		var strongBlueHxCode = '#0000ff'; // red: 0, green: 0, blue: 255
 		var softBlueHxCode = '#0000af'; // red: 0, green: 0, blue: 175
 
-		function show_the_button(strColor){
-			var obj = ".simon-game #"+strColor+"-button";
-			var tableColors = {
-					"green": [strongGreenHxCode, softGreenHxCode],
-					"red": [strongRedHxCode, softRedHxCode],
-					"yellow": [strongYellowHxCode, softYellowHxCode],
-					"blue": [strongBlueHxCode, softBlueHxCode]
+		function show_the_button(strButton){
+			var obj = ".simon-game #"+strButton+"-button";
+			var tableButtons = {
+					"ul": [strongGreenHxCode, softGreenHxCode],
+					"ur": [strongRedHxCode, softRedHxCode],
+					"dl": [strongYellowHxCode, softYellowHxCode],
+					"dr": [strongBlueHxCode, softBlueHxCode]
 			};
 
-			simon.debug('show_the_button running... [obj]'+obj+', [strColor]'+strColor);
-			simon.debug('show_the_button running... [tableColors[strColor]]'+tableColors[strColor]);
+			simon.debug('show_the_button running... [obj]'+obj+', [strButton]'+strButton);
+			simon.debug('show_the_button running... [tableButtons[strButton]]'+tableButtons[strButton]);
 
-			$("#"+strColor+"-button")
+			$("#"+strButton+"-button")
 			.queue("showQB", function (next){
 				// set with strong green
-				$("#"+strColor+"-button").css('background-color', tableColors[strColor][0]);
+				$("#"+strButton+"-button").css('background-color', tableButtons[strButton][0]);
 				next();
 			});
 
-			$("#"+strColor+"-button").delay(_SHOW_THE_BUTTON_BEGIN_DELAY, "showQB");
+			$("#"+strButton+"-button").delay(_SHOW_THE_BUTTON_BEGIN_DELAY, "showQB");
 
-			simon.playColorSound(strColor);
+			simon.playButtonSound(strButton);
 
-			$("#"+strColor+"-button")
+			$("#"+strButton+"-button")
 			.queue("showQB", function (next){
 				// set with soft color
-				$("#"+strColor+"-button").css('background-color', tableColors[strColor][1]);
+				$("#"+strButton+"-button").css('background-color', tableButtons[strButton][1]);
 				next();
 			});
-			$("#"+strColor+"-button").delay(_SHOW_THE_BUTTON_END_DELAY, "showQB");//prueba
+			$("#"+strButton+"-button").delay(_SHOW_THE_BUTTON_END_DELAY, "showQB");//prueba
 
-			$("#"+strColor+"-button").dequeue( "showQB" );
+			$("#"+strButton+"-button").dequeue( "showQB" );
 
 		}
 
 		//
 		// Register events
 		//
-		$('.simon-game #green-button').bind('click',function(){
-			simon.debug('green button Clicked!');
-			show_the_button("green");
-			checkCorrectColor("green");
+		$('.simon-game #ul-button').bind('click',function(){
+			simon.debug('ul button Clicked!');
+			show_the_button("ul");
+			checkCorrectButton("ul");
 
 		});
-		$('.simon-game #red-button').bind('click',function(){
-			simon.debug('red button Clicked!');
-			show_the_button("red");
-			checkCorrectColor("red");
+		$('.simon-game #ur-button').bind('click',function(){
+			simon.debug('ur button Clicked!');
+			show_the_button("ur");
+			checkCorrectButton("ur");
 
 		});
-		$('.simon-game #yellow-button').bind('click',function(){
-			simon.debug('yellow button Clicked!');       	
-			show_the_button("yellow");       	
-			checkCorrectColor("yellow");
+		$('.simon-game #dl-button').bind('click',function(){
+			simon.debug('dl button Clicked!');       	
+			show_the_button("dl");       	
+			checkCorrectButton("dl");
 		});
-		$('.simon-game #blue-button').bind('click',function(){
-			simon.debug('blue button Clicked!');
-			show_the_button("blue");
-			checkCorrectColor("blue");            
+		$('.simon-game #dr-button').bind('click',function(){
+			simon.debug('dr button Clicked!');
+			show_the_button("dr");
+			checkCorrectButton("dr");            
 		});
 
 	}
