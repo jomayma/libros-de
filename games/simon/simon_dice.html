@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>SIMON classic game</title>
+	<link rel="stylesheet" href="./css/blueprint/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="./css/blueprint/print.css" type="text/css" media="print"> 
+	<!--[if lt IE 8]>
+	  <link rel="stylesheet" href="./css/blueprint/ie.css" type="text/css" media="screen, projection">
+	<![endif]-->
+	<link rel="stylesheet" href="./css/simon_blueprint.css">
+	<script src="./js/jquery/jquery-1.6.2.min.js"></script>
+	<!--  script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"/></script -->
+	<script src="./js/jquery.simon.js"></script>
+	<!-- script type="text/javascript" src="http://github.com/jomayma/libros-de/tree/master/games/simon_game/webapp-simon-game/src/main/webapp/js/jquery.simon.js"/ -->
+</head>
+<body>					
+<audio class="sound-green" preload>
+        <source src="./audio/DO1.WAV"></source>
+        <!-- source src="./audio/do.0.5.wav"></source -->
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-red" preload>
+        <source src="./audio/RE.WAV"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-yellow" preload>
+        <source src="./audio/MI.WAV"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-blue" preload>
+        <source src="./audio/FA.WAV"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+<audio class="sound-error" preload>
+        <source src="./audio/beep-8.wav"></source>
+        Your browser isn't invited for super fun audio time.
+</audio>
+
+<div class="container simon-game" id="simon">
+	<h1>Simon game</h1>
+	<hr>
+	<div class="_notice">
+	<h2 class="alt game-description notice" id="game-status">Do you want to play?</h1>
+	</div>
+	<hr>
+	<div class="span-13">
+		<div class="span-4 quartercircle_ul" id="green-button"><br/><br/><br/><br/><br/><br/><br/></div>
+		<div class="span-2"><br/><br/><br/><br/>&nbsp;</div>
+		<div class="span-4 last quartercircle_ur" id="red-button"><br/><br/><br/><br/><br/><br/><br/></div>
+		<div class="span-4"><br/><br/><br/>&nbsp;</div>
+		<div class="span-1 info">
+			<a href="#" id="play"><strong>Start</strong></a><br/>
+			<a href="#" id="reset"><strong>Stop</strong></a><br/>
+		</div>
+		<div class="span-5 last"><br/><br/><br/>&nbsp;</div>
+		<div class="span-4 quartercircle_dl" id="yellow-button"><br/><br/><br/><br/><br/><br/><br/></div>
+		<div class="span-2"><br/><br/>&nbsp;</div>
+		<div class="span-4 last quartercircle_dr" id="blue-button"><br/><br/><br/><br/><br/><br/><br/></div>
+	</div>
+	<div class="span-11 last"><br/><br/><br/><br/><br/><br/><br/>
+	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>&nbsp;</div>
+	<hr class="space">
+	<hr>	
+		<h4 class="alt center">
+		<strong>Simon Game Credits: </strong>
+		jomayma would thanx to jQuery API and blueprint CSS libraries.
+		</h4>
+	<hr>
+</div>
+<script type="text/javascript">
+<!-- SIMON PLUGIN - BEGIN --> 
+jQuery("#simon").simon({
+	   DEBUG_ENABLED: true,
+	   playColorSound: function (colorStr) {
+			this.debug("playColorSound(using html5 audio tag) -> colorStr param :: "+colorStr);
+			$(".sound-"+colorStr)[0].play();
+	   },
+	   playErrorSound: function() {
+		    this.debug("playErrorSound(using html5 audio tag)");
+			$(".sound-error")[0].play();
+	   }
+});
+</script>
+<!-- SIMON PLUGIN - END -->
+</script>
+</body>
+</html>

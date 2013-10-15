@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>SIMON classic game</title>
+	<link rel="stylesheet" href="./css/blueprint/screen.css" type="text/css" media="screen, projection">
+	<link rel="stylesheet" href="./css/blueprint/print.css" type="text/css" media="print"> 
+	<!--[if lt IE 8]>
+	  <link rel="stylesheet" href="./css/blueprint/ie.css" type="text/css" media="screen, projection">
+	<![endif]-->
+	<link rel="stylesheet" href="./css/simon_pxldr.css">
+	<script src="./js/jquery/jquery-1.6.2.min.js"></script>
+	<!-- include SM2 library -->
+	<script src="./js/s2/soundmanager2.js"></script>
+	<script src="./js/pxldr/PxLoader.js"></script>
+	<script src="./js/pxldr/PxLoaderImage.js"></script>
+	<script src="./js/pxldr/PxLoaderSound.js"></script> 
+	<script src="./js/jquery.simon.js"></script>
+</head>
+<body>					
+<div class="container simon-game" id="simon">
+	<h1>Simon game</h1>
+	<hr>
+	<div class="_notice">
+	<h2 class="alt game-description notice" id="game-status">Do you want to play?</h1>
+	</div>
+	<hr>
+	<div class="span-13">
+		<div class="span-4 quartercircle_ul hide" id="ul-button"><br/><br/><br/><br/><br/><br/><br/></div>
+		<div class="span-2"><br/><br/><br/><br/>&nbsp;</div>
+		<div class="span-4 last quartercircle_ur hide" id="ur-button"><br/><br/><br/><br/><br/><br/><br/></div>
+		<div class="span-4"><br/><br/><br/>&nbsp;</div>
+		<div id="game-menu" class="span-1 info hide">
+			<a href="#" id="play"><strong>Start</strong></a><br/>
+			<a href="#" id="reset"><strong>Stop</strong></a><br/>
+		</div>
+		<div class="span-5 last"><br/><br/><br/>&nbsp;</div>
+		<div class="span-4 quartercircle_dl hide" id="dl-button"><br/><br/><br/><br/><br/><br/><br/></div>
+		<div class="span-2"><br/><br/>&nbsp;</div>
+		<div class="span-4 last quartercircle_dr hide" id="dr-button"><br/><br/><br/><br/><br/><br/><br/></div>
+	</div>
+	<div class="span-11 last"><br/><br/><br/><br/><br/><br/><br/>
+	<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>&nbsp;</div>
+	<hr class="space">
+	<hr>	
+		<h4 class="alt center">
+		<strong>Simon Game Credits: </strong>
+		jomayma would thanx to jQuery API, blueprint CSS and Sound Manager 2 libraries.
+		</h4>
+	<hr>
+</div>
+<script type="text/javascript">
+<!-- CALLING SIMON PLUGIN - BEGIN -->
+
+(function( $ ){
+  $.fn.show = function( ) {  
+    return $(this).removeClass('hide').addClass('show');
+  }
+})( jQuery );
+
+//First, initializing the soundManager
+console.log("initializing the soundManager...");
+soundManager.debugMode = true;
+
+soundManager.url = './swf/'; // directory where SM2 .SWFs live
+console.log("[soundManager?]",soundManager);
+
+//initialize the sound manager 
+soundManager.flashVersion = 9; 
+soundManager.useHighPerformance = true; // reduces delays 
+ 
+// reduce the default 1 sec delay to 500 ms 
+soundManager.flashLoadTimeout = 500; 
+ 
+// mp3 is required by default, but we don't want any requirements 
+soundManager.audioFormats.mp3.required = false; 
+
+console.log("initializing the soundManager finished.");
+
+// flash may timeout if not installed or when flashblock is installed 
+soundManager.ontimeout(function(status) { 
+    // no flash, go with HTML5 audio 
+    soundManager.useHTML5Audio = true; 
+    soundManager.preferFlash = false; 
+    soundManager.reboot(); 
+});
+ 
+soundManager.onready(function() { 
+    // ok to show the button play run the game 
+	console.log("soundManager is ready!!");
+	
+	//sounds loading
+	var soundNames = [['DO1','ul'], ['RE','ur'], ['MI','dl'], ['FA','dr'], ['beep-8','error']]; 
+	console.log("soundNames",soundNames);
+	var loader = new PxLoader(); 
+	var i, len, url;
+	
+	console.log("soundNames.length=",soundNames.length);
+	// queue each sound for loading 
+	for(i=0, len = soundNames.length; i < len; i++) { 
+	    // see if the browser can play wav 
+	    url = './audio/' + soundNames[i][0] + '.mp3';
+	    console.log("canPlay? url :: ",url);
+	    if (!soundManager.canPlayURL(url)) { 
+	 
+	        // ok, what about ogg? 
+	        url = '/audio/' + soundNames[i][0] + '.ogg';
+	        console.log("canPlay? url :: ",url);
+	        if (!soundManager.canPlayURL(url)) { 
+	            continue; // can't be played 
+	        } 
+	    } 
+	 
+	    // queue the sound using the color name as the SM2 id 
+	    loader.addSound(soundNames[i][1], url);
+	    console.log("soundNames[i][1]=",soundNames[i][1]);
+	} 
+	
+	// listen to load events 
+	loader.addProgressListener(function(e) { 
+	 
+	    // show the icon once a sound has loaded 
+	    var soundId = e.resource.sound.sID;
+	    console.log("loader.addProgressListener - soundId=",soundId);
+	    var $icon = $('#' + soundId+'-button');
+	    //$("#"+strColor+"-button")
+	 	$icon.show();
+	    // play the sound when the icon is clicked 
+	    $icon.click(function() { 
+	        // highlight the icon while playing 
+	        $icon.addClass(soundId+'_playing'); 
+	        soundManager.play(soundId, { 
+	            onfinish: function() { 
+	                $icon.removeClass(soundId+'_playing'); 
+	            } 
+	        });
+	    });
+	    //soundManager.play(soundId); 
+	}); 
+	 
+	loader.start();
+	$('#game-menu').show();
+});
+
+jQuery("#simon").simon({
+	   DEBUG_ENABLED: false,
+	   playButtonSound: function (buttonStr) {
+			this.debug("playButtonSound(with soundManager 2) -> buttonStr param :: "+buttonStr);
+			soundManager.play(buttonStr);
+	   },
+	   playErrorSound: function () {
+			this.debug("playErrorSound(with soundManager 2)");
+			soundManager.play('error');
+	   }
+});
+
+</script>
+<!-- CALLING SIMON PLUGIN - END -->
+</script>
+</body>
+</html>

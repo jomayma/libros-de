@@ -1,0 +1,128 @@
+a.button_round_up{
+	 -moz-border-radius: 18px 18px 0 0;
+     -webkit-border-radius: 18px 18px 0 0;
+     background-color:#CC0066;
+}
+
+a.button_round_up:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+
+a.button_round_down{
+	 -moz-border-radius: 0 0 18px 18px;
+     -webkit-border-radius: 0 0 18px 18px;
+     background-color:#A347FF;
+}
+
+a.button_round_down:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+
+.quartercircle {
+     height: 100px;
+     width: 100px;
+     margin: 0 auto;
+     border-width: 3px;
+     background-color: #AE00AE;
+     text-indent: -9999px;
+     -moz-border-radius: 100px 0 0 0;
+     -webkit-border-radius: 100px 0 0 0;
+     box-shadow: 0 -4px 5px rgba(255, 255, 255, 0.2) inset, 0 1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 0 #1E4766, 0 6px 0 #1E4766, 0 8px 5px rgba(0, 0, 0, 0.5);
+}
+.quartercircle:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+.quartercircle_ul {
+	 left:0px;
+	 margin-bottom: 0px;
+  	 margin-left: 0px;
+  	 margin-right: 0px;
+  	 margin-top: 0px;
+     border-width: 3px;
+     background-color: #00af00;
+     text-indent: -9999px;
+     -moz-border-radius: 100px 0 20px 0;
+     -webkit-border-radius: 100px 0 20px 0;
+     box-shadow: 0 -4px 5px rgba(255, 255, 255, 0.2) inset, 0 1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 0 #1E4766, 0 6px 0 #1E4766, 0 8px 5px rgba(0, 0, 0, 0.5);
+}
+.quartercircle_ul:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+.ul_playing {
+	background-color: #00ff00;	
+}
+
+.back_grsoft {
+	background-color: #33FF66;
+}
+
+.quartercircle_ur {
+     top: 0px;
+	 margin-bottom: 0px;
+  	 margin-left: 0px;
+  	 margin-right: 0px;
+  	 margin-top: 0px;
+     border-width: 3px;
+     background-color: #af0000;
+     text-indent: -9999px;
+     -moz-border-radius: 0 100px 0 20px;
+     -webkit-border-radius: 0 100px 0 20px;
+     box-shadow: 0 -4px 5px rgba(255, 255, 255, 0.2) inset, 0 1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 0 #1E4766, 0 6px 0 #1E4766, 0 8px 5px rgba(0, 0, 0, 0.5);
+}
+.quartercircle_ur:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+.ur_playing {
+	background-color: #ff0000;
+}
+
+.quartercircle_dl {
+     margin: 0 auto;
+     border-width: 3px;
+     background-color: #afaf00;
+     text-indent: -9999px;
+     -moz-border-radius: 0 20px 0 100px;
+     -webkit-border-radius: 0 20px 0 100px;
+     box-shadow: 0 -4px 5px rgba(255, 255, 255, 0.2) inset, 0 1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 0 #1E4766, 0 6px 0 #1E4766, 0 8px 5px rgba(0, 0, 0, 0.5);
+}
+.quartercircle_dl:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+.dl_playing{
+	background-color: #ffff00;
+}
+
+.quartercircle_dr {
+     right: 0px;
+	 margin-bottom: 0px;
+  	 margin-left: 0px;
+  	 margin-right: 0px;
+  	 margin-top: 0px;
+     border-width: 3px;
+     background-color: #0000af;
+     text-indent: -9999px;
+     -moz-border-radius: 20px 0 100px 0;
+     -webkit-border-radius: 20px 0 100px 0;
+     box-shadow: 0 -4px 5px rgba(255, 255, 255, 0.2) inset, 0 1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 0 #1E4766, 0 6px 0 #1E4766, 0 8px 5px rgba(0, 0, 0, 0.5);
+}
+.quartercircle_dr:active {
+   	box-shadow: 0 4px 5px rgba(255, 255, 255, 0.4) inset, 0 -1px 5px rgba(255, 255, 255, 0.2) inset, 0 2px 0 #1E4766, 0 4px 5px rgba(0, 0, 0, 0.5);
+   	top: 4px;
+}
+.dr_playing {
+	background-color: #0000ff;
+}
+
+.show {
+	visibility:visible;
+}
+
+.hide {
+	visibility:hidden;
+}
